@@ -1,9 +1,9 @@
-package taskmanager.manager;
+package scheduler.manager;
 
-import taskmanager.model.Epic;
-import taskmanager.model.Subtask;
-import taskmanager.model.Task;
-import taskmanager.model.TaskStatus;
+import scheduler.task.Epic;
+import scheduler.task.Subtask;
+import scheduler.task.Task;
+import scheduler.task.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -206,7 +206,7 @@ public class TaskManager {
     public ArrayList<Subtask> getSubtaskByEpic(Epic epic) {
         ArrayList<Subtask> list = new ArrayList<>();
         if (epic == null) return list;
-        for(int key:epic.getSubtasks().keySet()){
+        for (int key : epic.getSubtasks().keySet()) {
             list.add(epic.getSubtasks().get(key).cloneTask());
         }
         return list;

@@ -1,4 +1,4 @@
-package taskmanager.model;
+package scheduler.task;
 
 import java.util.Objects;
 
@@ -74,9 +74,10 @@ public class Task {
         task.setId(id);
         return task;
     }
-    public void updateFrom(Task task){
-        this.name= task.name;
-        this.description=task.description;
-        this.status=task.status;
+
+    public void updateFrom(Task task) {
+        this.name = task.name;
+        this.description = task.description;
+        this.status = task.status;
     }
 }

@@ -1,8 +1,8 @@
-import taskmanager.manager.TaskManager;
-import taskmanager.model.Epic;
-import taskmanager.model.Subtask;
-import taskmanager.model.Task;
-import taskmanager.model.TaskStatus;
+import scheduler.manager.TaskManager;
+import scheduler.task.Epic;
+import scheduler.task.Subtask;
+import scheduler.task.Task;
+import scheduler.task.TaskStatus;
 
 import java.util.ArrayList;
 
@@ -163,6 +163,6 @@ public class Test {
     }
 
     private static void printTestOK(String name, Object result) {
-        System.out.println("--- TEST PASS: " + name+". result: "+result);
+        System.out.println("--- TEST PASS: " + name + ". result: " + result);
     }
 }

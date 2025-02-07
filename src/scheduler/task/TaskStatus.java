@@ -1,4 +1,4 @@
-package taskmanager.model;
+package scheduler.task;
 
 public enum TaskStatus {
     NEW,

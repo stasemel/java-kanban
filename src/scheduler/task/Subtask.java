@@ -1,4 +1,4 @@
-package taskmanager.model;
+package scheduler.task;
 
 public class Subtask extends Task {
 
@@ -18,7 +18,7 @@ public class Subtask extends Task {
 
     @Override
     public Subtask cloneTask() {
-        Subtask outSubtask = new Subtask(getName(),getDescription(),getStatus());
+        Subtask outSubtask = new Subtask(getName(), getDescription(), getStatus());
         outSubtask.setId(getId());
         return outSubtask;
     }
