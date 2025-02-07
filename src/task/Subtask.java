@@ -1,4 +1,4 @@
-package scheduler.task;
+package task;
 
 public class Subtask extends Task {
 

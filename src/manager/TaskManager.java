@@ -1,9 +1,9 @@
-package scheduler.manager;
+package manager;
 
-import scheduler.task.Epic;
-import scheduler.task.Subtask;
-import scheduler.task.Task;
-import scheduler.task.TaskStatus;
+import task.Epic;
+import task.Subtask;
+import task.Task;
+import task.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;

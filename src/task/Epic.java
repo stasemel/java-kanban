@@ -1,4 +1,4 @@
-package scheduler.task;
+package task;
 
 import java.util.HashMap;
 

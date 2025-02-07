@@ -1,2 +1,2 @@
-# java-kanban
+# java-manager
 Repository for homework project.

@@ -1,4 +1,4 @@
-package scheduler.task;
+package task;
 
 public enum TaskStatus {
     NEW,
