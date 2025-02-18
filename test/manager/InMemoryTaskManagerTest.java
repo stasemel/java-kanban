@@ -19,14 +19,17 @@ class InMemoryTaskManagerTest {
 
     private void addNewEpicsForTests(int count) {
         for (int i = 0; i < count; i++) {
-            Epic epic = new Epic("Эпик No " + (i + 1), "Описение эпика No" + (i + 1), TaskStatus.NEW);
+            Epic epic = new Epic(String.format("Эпик No %d", i + 1), String.format("Описание эпика No %d", i + 1),
+                    TaskStatus.NEW);
             manager.addEpic(epic);
         }
     }
 
     private void addSubtasksForTests(int count, Epic epic, TaskStatus status) {
         for (int i = 0; i < count; i++) {
-            Subtask subtask = new Subtask("Subtask No " + (i + 1), "Описение сабтаска No" + (i + 1), status);
+            Subtask subtask = new Subtask(String.format("Subtask No %d", i + 1),
+                    String.format("Описание сабтаска No %d", i + 1),
+                    status);
             manager.addSubtask(subtask, epic);
         }
     }
@@ -96,15 +99,16 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldEpicChangeStatusWhenAddSubtaskWithStatusInPorgress() {
+    void changeEpicStatusWhenAddSubtaskInPorgress() {
         addNewEpicsForTests(1);
         Subtask subtask = new Subtask("Subtask", "Описание Subtask", TaskStatus.IN_PROGRESS);
         manager.addSubtask(subtask, manager.getEpicById(1));
-        assertEquals(TaskStatus.IN_PROGRESS, manager.getEpicById(1).getStatus(), "Не изменился статус Epic при доабвлении Subtask со статусом IN_PROGRESS");
+        assertEquals(TaskStatus.IN_PROGRESS, manager.getEpicById(1).getStatus(),
+                "Не изменился статус Epic при добавлении Subtask со статусом IN_PROGRESS");
     }
 
     @Test
-    void shouldEpicChangeStatusWhenAddSubtaskWithStatusDone() {
+    void changeEpicStatusWhenAddSubtaskDone() {
         addNewEpicsForTests(1);
         Subtask subtask = new Subtask("Subtask", "Описание Subtask", TaskStatus.DONE);
         manager.addSubtask(subtask, manager.getEpicById(1));

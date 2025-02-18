@@ -19,15 +19,17 @@ public class Main {
         final int epicNumber = 4;
         final int subtaskNamber = 3;
         for (int i = 0; i < taskNumber; i++) {
-            Task task = new Task("Task No " + (i + 1), "Описание таска No " + (i + 1), TaskStatus.NEW);
+            Task task = new Task(String.format("Task No %d", (i + 1)), String.format("Описание таска No %d", (i + 1)),
+                    TaskStatus.NEW);
             manager.addTask(task);
         }
         for (int i = 0; i < epicNumber; i++) {
-            Epic epic = new Epic("Epic No " + (i + 1), "Описание эпика No " + (i + 1), TaskStatus.NEW);
+            Epic epic = new Epic(String.format("Epic No %d", (i + 1)), String.format("Описание эпика No %d", (i + 1)),
+                    TaskStatus.NEW);
             manager.addEpic(epic);
             for (int j = 0; j < subtaskNamber; j++) {
-                Subtask subtask = new Subtask("Subtask No " + (j + 1) + " эпика " + epic.getId(),
-                        "Описание сабтаска " + (j + 1) + " эпика " + epic.getId(),
+                Subtask subtask = new Subtask(String.format("Subtask No %d эпика %d", j + 1, epic.getId()),
+                        String.format("Описание сабтаска %d эпика %d", j + 1, epic.getId()),
                         TaskStatus.NEW);
                 manager.addSubtask(subtask, epic);
             }
