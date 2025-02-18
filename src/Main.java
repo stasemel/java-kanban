@@ -8,7 +8,6 @@ import task.TaskStatus;
 public class Main {
 
     public static void main(String[] args) {
-//        Test.testTaskManager(); //не хочется терять
         TaskManager taskManager = Managers.getDefault();
         populate(taskManager);
         testViews(taskManager);
