@@ -52,10 +52,10 @@ class InMemoryTaskManagerTest {
         String description = task.getDescription();
         TaskStatus status = task.getStatus();
         manager.addTask(task);
-        Task addedTask=manager.getTaskById(1);
-        assertEquals(name,addedTask.getName(),"Изменилось имя при добавлении Task в менеджер");
-        assertEquals(description,addedTask.getDescription(),"Изменилось описание при добавлении Task в менеджер");
-        assertEquals(status,addedTask.getStatus(),"Изменился статус при добавлении Task в менеджер");
+        Task addedTask = manager.getTaskById(1);
+        assertEquals(name, addedTask.getName(), "Изменилось имя при добавлении Task в менеджер");
+        assertEquals(description, addedTask.getDescription(), "Изменилось описание при добавлении Task в менеджер");
+        assertEquals(status, addedTask.getStatus(), "Изменился статус при добавлении Task в менеджер");
     }
 
     @Test

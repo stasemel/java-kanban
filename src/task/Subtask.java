@@ -23,7 +23,7 @@ public class Subtask extends Task {
         if (epic == null) {
             outSubtask = new Subtask(getName(), getDescription(), getStatus());
         } else {
-            outSubtask=epic.cloneTask().getSubtasks().get(getId()); //через клонирование эпика, так можно избежать рекурсии
+            outSubtask = epic.cloneTask().getSubtasks().get(getId()); //через клонирование эпика, так можно избежать рекурсии
         }
         outSubtask.setId(getId());
         return outSubtask;

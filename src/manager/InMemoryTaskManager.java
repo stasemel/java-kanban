@@ -105,8 +105,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     private Epic cloneEpicBySubtask(Subtask subtask) {
         Integer epicId = subtask.getEpic().getId();
-        Epic cloneEpic = epics.get(epicId).cloneTask();
-        return cloneEpic;
+        return epics.get(epicId).cloneTask();
     }
 
     @Override
