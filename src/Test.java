@@ -24,11 +24,11 @@ public class Test {
         printTestResult("Создание менеджера, добавление тасков, получение списка тасков", Integer.toString(listTasks.size()), Integer.toString(3));
 
         //Поиск Task по существующему id
-        Task foundTask = manager.getTask(task1.getId());
+        Task foundTask = manager.getTaskById(task1.getId());
         printTestResult("Поиск Task по существующему id ", foundTask.getId(), task1.getId());
 
         //Поиск Task по несуществующему id
-        Task notFoundTask = manager.getTask(0);
+        Task notFoundTask = manager.getTaskById(0);
         printTestResult("Поиск Task по существующему id", notFoundTask, null);
 
         //Проверка обновления Task:
@@ -36,16 +36,16 @@ public class Test {
         task1.setDescription("Проверить обновление данных первой задачи");
         task1.setStatus(TaskStatus.IN_PROGRESS);
         manager.updateTask(task1);
-        printTestResult("Проверить обновление данных таска. Свойство name", manager.getTask(task1.getId()).getName(), task1.getName());
+        printTestResult("Проверить обновление данных таска. Свойство name", manager.getTaskById(task1.getId()).getName(), task1.getName());
         printTestResult("Проверить обновление данных таска. Свойство description",
-                manager.getTask(task1.getId()).getDescription(),
+                manager.getTaskById(task1.getId()).getDescription(),
                 task1.getDescription());
-        printTestResult("Проверить обновление данных таска. Свойство status", manager.getTask(task1.getId()).getStatus(), task1.getStatus());
+        printTestResult("Проверить обновление данных таска. Свойство status", manager.getTaskById(task1.getId()).getStatus(), task1.getStatus());
 
         //Удаление по идентификатору
         int deleteId = task2.getId();
         manager.deleteTaskById(deleteId);
-        printTestResult("Удаление по идентификатору: ", manager.getTask(deleteId), null);
+        printTestResult("Удаление по идентификатору: ", manager.getTaskById(deleteId), null);
 
         //Удаление по несуществующему идентификатору
         manager.deleteTaskById(0);
@@ -60,18 +60,18 @@ public class Test {
         Epic epic2 = new Epic("Второй эпик", "Проверяем создание второго эпика", TaskStatus.IN_PROGRESS);
         Epic epic3 = new Epic("Третий эпик", "Проверяем создание третьего эпика", TaskStatus.NEW);
         manager.addEpic(epic1);
-        printTestResult("Создание эпика со статусом DONE. Проверка установки статуса NEW ", manager.getEpic(epic1.getId()).getStatus(), TaskStatus.NEW);
+        printTestResult("Создание эпика со статусом DONE. Проверка установки статуса NEW ", manager.getEpicById(epic1.getId()).getStatus(), TaskStatus.NEW);
         manager.addEpic(epic2);
-        printTestResult("Создание эпика со статусом IN_PROGRESS. Проверка установки статуса NEW ", manager.getEpic(epic2.getId()).getStatus(), TaskStatus.NEW);
+        printTestResult("Создание эпика со статусом IN_PROGRESS. Проверка установки статуса NEW ", manager.getEpicById(epic2.getId()).getStatus(), TaskStatus.NEW);
         manager.addEpic(epic3);
-        printTestResult("Создание эпика со статусом NEW. Проверка установки статуса NEW ", manager.getEpic(epic3.getId()).getStatus(), TaskStatus.NEW);
+        printTestResult("Создание эпика со статусом NEW. Проверка установки статуса NEW ", manager.getEpicById(epic3.getId()).getStatus(), TaskStatus.NEW);
 
         //Получаем список эпиков
         ArrayList<Epic> epics = manager.getAllEpics();
         printTestResult("Получение списка эпиков", epics.size(), 3);
 
         //Получаем эпик по id
-        printTestResult("Получаем эпик по id", manager.getEpic(epic1.getId()).getId(), epic1.getId());
+        printTestResult("Получаем эпик по id", manager.getEpicById(epic1.getId()).getId(), epic1.getId());
 
         //Добавляем эпику сабтаски
         Subtask subtask1 = new Subtask("Первый сабтаск первого эпика", "Добавить первый сабтаск первому эпику", TaskStatus.NEW);
@@ -115,23 +115,23 @@ public class Test {
         //Удаляем четвертый сабтаск
         int deleteSubtackId = subtask4.getId();
         manager.deleteSubtaskById(deleteSubtackId);
-        printTestResult("Удаление сабтаска по id", manager.getSubtask(deleteSubtackId), null);
-        printTestResult("Смена статуса epic при удалении сабтаска", manager.getEpic(epic1.getId()).getStatus(), TaskStatus.DONE);
+        printTestResult("Удаление сабтаска по id", manager.getSubtaskById(deleteSubtackId), null);
+        printTestResult("Смена статуса epic при удалении сабтаска", manager.getEpicById(epic1.getId()).getStatus(), TaskStatus.DONE);
 
         //Проверка изменения эпика
         epic1.setName("Новое имя первого эпика");
         manager.updateEpic(epic1);
-        printTestResult("Проверка изменения имени эпика", manager.getEpic(epic1.getId()).getName(), epic1.getName());
+        printTestResult("Проверка изменения имени эпика", manager.getEpicById(epic1.getId()).getName(), epic1.getName());
 
         //Удаляем второй эпик
         int deleteEpicId = epic2.getId();
         manager.deleteEpicById(deleteEpicId);
-        printTestResult("Удаление эпика по id", manager.getEpic(deleteEpicId), null);
-        printTestResult("Проверка удаления сабтаска при удалении эпика", manager.getSubtask(subtask21.getId()), null);
+        printTestResult("Удаление эпика по id", manager.getEpicById(deleteEpicId), null);
+        printTestResult("Проверка удаления сабтаска при удалении эпика", manager.getSubtaskById(subtask21.getId()), null);
 
         //Удаляем все сабтаски
         manager.deleteAllSubtasks();
-        printTestResult("Смена статуса epic при удалении всех сабтасков", manager.getEpic(epic1.getId()).getStatus(), TaskStatus.NEW);
+        printTestResult("Смена статуса epic при удалении всех сабтасков", manager.getEpicById(epic1.getId()).getStatus(), TaskStatus.NEW);
 
         //Удаляем все эпики
         manager.deleteAllEpics();

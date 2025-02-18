@@ -23,10 +23,11 @@ public class Epic extends Task {
         Epic outEpic = new Epic(getName(), getDescription(), getStatus());
         outEpic.setId(getId());
         outEpic.setId(this.getId());
-        for (int key : subtasks.keySet()) {
-            Subtask outSubtask = subtasks.get(key).cloneTask();
+        for (Subtask subtask : subtasks.values()) {
+            Subtask outSubtask = new Subtask(subtask.getName(), subtask.getDescription(), subtask.getStatus());
+            outSubtask.setId(subtask.getId());
             outSubtask.setEpic(outEpic);
-            outEpic.subtasks.put(key, outSubtask);
+            outEpic.subtasks.put(subtask.getId(), outSubtask);
         }
         return outEpic;
     }

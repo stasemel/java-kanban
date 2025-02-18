@@ -12,10 +12,10 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private static int idCount = 0;
+    private int idCount = 0;
     HistoryManager historyManager = Managers.getDefaultHistory();
 
-    public static int getNewId() {
+    public int getNewId() {
         idCount++;
         return idCount;
     }
@@ -56,7 +56,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTask(int id) {
+    public Task getTaskById(int id) {
         if (tasks.containsKey(id)) {
             Task task = tasks.get(id);
             historyManager.add(task);
@@ -66,9 +66,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic getEpic(int id) {
+    public Epic getEpicById(int id) {
         if (epics.containsKey(id)) {
-            Epic epic=epics.get(id);
+            Epic epic = epics.get(id);
             historyManager.add(epic);
             return epic.cloneTask();
         }
@@ -76,11 +76,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask getSubtask(int id) {
+    public Subtask getSubtaskById(int id) {
         if (subtasks.containsKey(id)) {
-            Subtask subtask=subtasks.get(id);
+            Subtask subtask = subtasks.get(id);
             historyManager.add(subtask);
-            return subtask.cloneTask();
+            return cloneEpicBySubtask(subtask).getSubtasks().get(id);
         }
         return null;
     }
@@ -89,7 +89,7 @@ public class InMemoryTaskManager implements TaskManager {
     public ArrayList<Task> getAllTasks() {
         ArrayList<Task> list = new ArrayList<>();
         for (Integer id : tasks.keySet()) {
-            list.add(getTask(id)); //возращаем копию объекта
+            list.add(tasks.get(id).cloneTask()); //возращаем копию объекта
         }
         return list;
     }
@@ -98,16 +98,31 @@ public class InMemoryTaskManager implements TaskManager {
     public ArrayList<Epic> getAllEpics() {
         ArrayList<Epic> list = new ArrayList<>();
         for (Integer id : epics.keySet()) {
-            list.add(getEpic(id)); //возращаем копию объекта
+            list.add(epics.get(id).cloneTask()); //возращаем копию объекта
         }
         return list;
+    }
+
+    private Epic cloneEpicBySubtask(Subtask subtask) {
+        Integer epicId = subtask.getEpic().getId();
+        Epic cloneEpic = epics.get(epicId).cloneTask();
+        return cloneEpic;
     }
 
     @Override
     public ArrayList<Subtask> getAllSubtasks() {
         ArrayList<Subtask> list = new ArrayList<>();
-        for (Integer id : subtasks.keySet()) {
-            list.add(getSubtask(id)); //возращаем копию объекта
+        final HashMap<Integer, Epic> epicsMap = new HashMap<>(); //клонированные эпики
+        for (Subtask subtask : subtasks.values()) {
+            Integer epicId = subtask.getEpic().getId();
+            Epic cloneEpic;
+            if (epicsMap.containsKey(epicId)) {
+                cloneEpic = epicsMap.get(epicId);
+            } else {
+                cloneEpic = cloneEpicBySubtask(subtask);
+                epicsMap.put(epicId, cloneEpic);
+            }
+            list.add(epicsMap.get(epicId).getSubtasks().get(subtask.getId())); //возращаем копию объекта
         }
         return list;
     }
@@ -191,7 +206,7 @@ public class InMemoryTaskManager implements TaskManager {
     private void updateEpicStatus(Epic epic) {
         if (epic == null) return;
         HashMap<Integer, Subtask> subtasks = epic.getSubtasks();
-        if (subtasks.size() == 0) {
+        if (subtasks.isEmpty()) {
             epic.setStatus(TaskStatus.NEW);
             return;
         }
@@ -232,10 +247,15 @@ public class InMemoryTaskManager implements TaskManager {
     public ArrayList<Subtask> getSubtaskByEpic(Epic epic) {
         ArrayList<Subtask> list = new ArrayList<>();
         if (epic == null) return list;
-        for (int key : epic.getSubtasks().keySet()) {
-            list.add(getSubtask(key));
+        Epic cloneEpic = epic.cloneTask();
+        for (int key : cloneEpic.getSubtasks().keySet()) {
+            list.add(epic.getSubtasks().get(key));
         }
         return list;
     }
 
+    @Override
+    public ArrayList<Task> getHistory() {
+        return historyManager.getHistory();
+    }
 }

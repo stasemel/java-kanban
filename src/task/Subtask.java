@@ -18,7 +18,13 @@ public class Subtask extends Task {
 
     @Override
     public Subtask cloneTask() {
-        Subtask outSubtask = new Subtask(getName(), getDescription(), getStatus());
+        Subtask outSubtask;
+        Epic epic = getEpic();
+        if (epic == null) {
+            outSubtask = new Subtask(getName(), getDescription(), getStatus());
+        } else {
+            outSubtask=epic.cloneTask().getSubtasks().get(getId()); //через клонирование эпика, так можно избежать рекурсии
+        }
         outSubtask.setId(getId());
         return outSubtask;
     }
@@ -26,7 +32,7 @@ public class Subtask extends Task {
     @Override
     public String toString() {
         return "Subtask{" +
-                "epic=" + epic.getId() +
+                ((epic == null) ? "epic=null" : "epic=" + epic.getId()) +
                 ", name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", id=" + getId() +

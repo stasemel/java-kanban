@@ -13,11 +13,11 @@ public interface TaskManager {
 
     public void addSubtask(Subtask subtask, Epic epic);
 
-    public Task getTask(int id);
+    public Task getTaskById(int id);
 
-    public Epic getEpic(int id);
+    public Epic getEpicById(int id);
 
-    public Subtask getSubtask(int id);
+    public Subtask getSubtaskById(int id);
 
     public ArrayList<Task> getAllTasks();
 
@@ -45,4 +45,5 @@ public interface TaskManager {
 
     public ArrayList<Subtask> getSubtaskByEpic(Epic epic);
 
+    public ArrayList<Task> getHistory();
 }
