@@ -42,7 +42,7 @@ class InMemoryHistoryManagerTest {
         final ArrayList<Task> history = historyManager.getHistory();
         Epic first = (Epic) history.getFirst();
         assertNotNull(history, "Не создалась история");
-        assertEquals(1, history.size(), "Не правильное количество записей в истории");
+        assertEquals(1, history.size(), "Неправильное количество записей в истории");
         assertEquals(epic, first, "Задачи не совпадают");
         assertEquals(epic.getSubtasks().get(11), first.getSubtasks().get(11), "Сабтаски не совпадают");
     }
@@ -65,7 +65,7 @@ class InMemoryHistoryManagerTest {
         }
         final ArrayList<Task> history = historyManager.getHistory();
         assertNotNull(history, "Не создалась история");
-        assertEquals(11, history.size(), "Не правильное количество записей в истории");
+        assertEquals(11, history.size(), "Неправильное количество записей в истории");
     }
 
     @Test
@@ -81,7 +81,7 @@ class InMemoryHistoryManagerTest {
         historyManager.add(task);
         final ArrayList<Task> history = historyManager.getHistory();
         assertNotNull(history, "Не создалась история");
-        assertEquals(10, history.size(), "Не правильное количество записей в истории");
+        assertEquals(10, history.size(), "Неправильное количество записей в истории");
         assertEquals(history.get(9), task, "Не добавился в последнюю позицию");
     }
 

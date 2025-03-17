@@ -64,7 +64,8 @@ class InMemoryTaskManagerTest {
     void shouldAddTaskWithSameStatus() {
         Task task1 = new Task("Первый таск", "Создать новую задачу", TaskStatus.IN_PROGRESS);
         manager.addTask(task1);
-        assertEquals(TaskStatus.IN_PROGRESS, manager.getTaskById(1).getStatus(), "Не создалась задача типа Task с тем же статусом");
+        assertEquals(TaskStatus.IN_PROGRESS, manager.getTaskById(1).getStatus(),
+                "Не создалась задача типа Task с тем же статусом");
     }
 
     @Test
@@ -78,7 +79,8 @@ class InMemoryTaskManagerTest {
     void ahouldAddEpicAndStatusMustSetNew() {
         Epic epic1 = new Epic("Первый эпик", "Проверяем создание первого эпика", TaskStatus.DONE);
         manager.addEpic(epic1);
-        assertEquals(TaskStatus.NEW, manager.getEpicById(1).getStatus(), "Не создалась задача типа Epic со статусом NEW");
+        assertEquals(TaskStatus.NEW, manager.getEpicById(1).getStatus(),
+                "Не создалась задача типа Epic со статусом NEW");
     }
 
     @Test
@@ -86,7 +88,8 @@ class InMemoryTaskManagerTest {
         addNewEpicsForTests(1);
         Subtask subtask = new Subtask("Subtask", "Описание Subtask", TaskStatus.NEW);
         manager.addSubtask(subtask, manager.getEpicById(1));
-        assertEquals(TaskStatus.NEW, manager.getSubtaskById(2).getStatus(), "Не создался Subtask со статусом NEW");
+        assertEquals(TaskStatus.NEW, manager.getSubtaskById(2).getStatus(),
+                "Не создался Subtask со статусом NEW");
     }
 
     @Test
@@ -94,7 +97,8 @@ class InMemoryTaskManagerTest {
         addNewEpicsForTests(1);
         Subtask subtask = new Subtask("Subtask", "Описание Subtask", TaskStatus.IN_PROGRESS);
         manager.addSubtask(subtask, manager.getEpicById(1));
-        assertEquals(TaskStatus.IN_PROGRESS, manager.getSubtaskById(2).getStatus(), "Не создался Subtask со статусом IN_PROGRESS");
+        assertEquals(TaskStatus.IN_PROGRESS, manager.getSubtaskById(2).getStatus(),
+                "Не создался Subtask со статусом IN_PROGRESS");
     }
 
     @Test
@@ -111,7 +115,8 @@ class InMemoryTaskManagerTest {
         addNewEpicsForTests(1);
         Subtask subtask = new Subtask("Subtask", "Описание Subtask", TaskStatus.DONE);
         manager.addSubtask(subtask, manager.getEpicById(1));
-        assertEquals(TaskStatus.DONE, manager.getEpicById(1).getStatus(), "Не изменился статус Epic при доабвлении Subtask со статусом DONE");
+        assertEquals(TaskStatus.DONE, manager.getEpicById(1).getStatus(),
+                "Не изменился статус Epic при доабвлении Subtask со статусом DONE");
     }
 
     @Test
@@ -175,7 +180,8 @@ class InMemoryTaskManagerTest {
         addNewEpicsForTests(1);
         addSubtasksForTests(3, manager.getEpicById(1), TaskStatus.NEW);
         manager.deleteSubtaskById(3);
-        assertEquals(2, manager.getAllSubtasks().size(), "Не корректное удаление сабтаска по deleteSubtaskById");
+        assertEquals(2, manager.getAllSubtasks().size(),
+                "Не корректное удаление сабтаска по deleteSubtaskById");
     }
 
     @Test
@@ -198,7 +204,8 @@ class InMemoryTaskManagerTest {
         addSubtasksForTests(2, manager.getEpicById(1), TaskStatus.NEW);
         addSubtasksForTests(2, manager.getEpicById(2), TaskStatus.NEW);
         manager.deleteAllEpics();
-        assertEquals(0, manager.getAllSubtasks().size(), "Проверка удаления всех Subtasks при удалении всех эпиков");
+        assertEquals(0, manager.getAllSubtasks().size(),
+                "Проверка удаления всех Subtasks при удалении всех эпиков");
     }
 
     @Test
@@ -224,7 +231,8 @@ class InMemoryTaskManagerTest {
         Task task = manager.getTaskById(1);
         task.setName("Новое имя таска");
         manager.updateTask(task);
-        assertEquals("Новое имя таска", manager.getTaskById(1).getName(), "Обновление имени таска по updateTask");
+        assertEquals("Новое имя таска", manager.getTaskById(1).getName(),
+                "Обновление имени таска по updateTask");
     }
 
     @Test
@@ -233,7 +241,8 @@ class InMemoryTaskManagerTest {
         Epic epic = manager.getEpicById(1);
         epic.setName("Новое имя эпика");
         manager.updateEpic(epic);
-        assertEquals("Новое имя эпика", manager.getEpicById(1).getName(), "Обновление имени эпика по updateEpic");
+        assertEquals("Новое имя эпика", manager.getEpicById(1).getName(),
+                "Обновление имени эпика по updateEpic");
 
     }
 
@@ -244,7 +253,8 @@ class InMemoryTaskManagerTest {
         Subtask subtask = manager.getSubtaskById(2);
         subtask.setName("Новое имя сабтаска");
         manager.updateSubtask(subtask);
-        assertEquals("Новое имя сабтаска", manager.getSubtaskById(2).getName(), "Обновление имени сабтаска при updateSubtask");
+        assertEquals("Новое имя сабтаска", manager.getSubtaskById(2).getName(),
+                "Обновление имени сабтаска при updateSubtask");
     }
 
     @Test
@@ -254,14 +264,16 @@ class InMemoryTaskManagerTest {
         Subtask subtask = manager.getSubtaskById(2);
         subtask.setStatus(TaskStatus.DONE);
         manager.updateSubtask(subtask);
-        assertEquals(TaskStatus.DONE, manager.getEpicById(1).getStatus(), "Обновление статуса эпика при смене статуса сабтаска при updateSubtask не произошло");
+        assertEquals(TaskStatus.DONE, manager.getEpicById(1).getStatus(),
+                "Обновление статуса эпика при смене статуса сабтаска при updateSubtask не произошло");
     }
 
     @Test
     void getSubtaskByEpicMustReturnAllEpicSuntasks() {
         addNewEpicsForTests(1);
         addSubtasksForTests(5, manager.getEpicById(1), TaskStatus.NEW);
-        assertEquals(5, manager.getSubtaskByEpic(manager.getEpicById(1)).size(), "Вернулось неправильное количество сабтасков эпика");
+        assertEquals(5, manager.getSubtaskByEpic(manager.getEpicById(1)).size(),
+                "Вернулось неправильное количество сабтасков эпика");
 
     }
 
@@ -290,8 +302,8 @@ class InMemoryTaskManagerTest {
             manager.getEpicById(epic.getId());
         }
         ArrayList<Task> history = manager.getHistory();
-        assertEquals(11, history.size(), "Количество просмотров должно быть " +
-                "равно количесвту уникальных id");
+        assertEquals(11, history.size(),
+                String.format("Количество просмотров должно быть равно %d количеству уникальных id", history.size()));
     }
 
     @Test
@@ -305,6 +317,6 @@ class InMemoryTaskManagerTest {
         manager.deleteEpicById(epic.getId());
         ArrayList<Task> history = manager.getHistory();
         assertEquals(10, history.size(), "Удаление таска должно удалять его из истории просмотров");
-        assertTrue(historyBeforeDelete.size() > history.size(), "Удаление элемента влияет на историю");
+        assertTrue(historyBeforeDelete.size() > history.size(), "Удаление не элемента влияет на историю");
     }
 }
