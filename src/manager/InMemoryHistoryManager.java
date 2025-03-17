@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class InMemoryHistoryManager implements HistoryManager {
+    private static final int MAX_HISTORY = 10;
+    private final ArrayList<Task> historyOfViews = new ArrayList<>();
+    private final HashMap<Integer, Node> hiMap = new HashMap<>();
     private Node first;
     private Node last;
     private int count = 0;
-    private static final int MAX_HISTORY = 10;
-    final private ArrayList<Task> historyOfViews = new ArrayList<>();
-    final private HashMap<Integer, Node> hiMap = new HashMap<>();
 
     @Override
     public ArrayList<Task> getHistory() {
