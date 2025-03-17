@@ -9,8 +9,7 @@ import task.TaskStatus;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class InMemoryTaskManagerTest {
@@ -285,22 +284,27 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldHistorySizeCannotBeGreaterThanTen() {
+    void shouldHistoryMustContainAllViews() {
         addNewEpicsForTests(11);
         for (Epic epic : manager.getAllEpics()) {
             manager.getEpicById(epic.getId());
         }
         ArrayList<Task> history = manager.getHistory();
-        assertEquals(10, history.size(), "Количество просмотров не должно быть больше 10");
+        assertEquals(11, history.size(), "Количество просмотров должно быть " +
+                "равно количесвту уникальных id");
     }
 
     @Test
-    void addElevenTaskInHistoryMustRemoveFirst() {
+    void shouldDeleteTaskMustRemoveFromHistory() {
         addNewEpicsForTests(11);
         for (Epic epic : manager.getAllEpics()) {
             manager.getEpicById(epic.getId());
         }
+        ArrayList<Task> historyBeforeDelete = manager.getHistory();
+        Epic epic = manager.getAllEpics().getFirst();
+        manager.deleteEpicById(epic.getId());
         ArrayList<Task> history = manager.getHistory();
-        assertEquals(2, history.getFirst().getId(), "Количество просмотров не должно быть больше 10");
+        assertEquals(10, history.size(), "Удаление таска должно удалять его из истории просмотров");
+        assertTrue(historyBeforeDelete.size() > history.size(), "Удаление элемента влияет на историю");
     }
 }
