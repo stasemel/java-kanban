@@ -303,7 +303,7 @@ class InMemoryTaskManagerTest {
         }
         ArrayList<Task> history = manager.getHistory();
         assertEquals(11, history.size(),
-                String.format("Количество просмотров должно быть равно %d количеству уникальных id", history.size()));
+                String.format("Количество просмотров должно быть равно %d, количеству уникальных id", history.size()));
     }
 
     @Test
