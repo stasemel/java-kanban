@@ -114,11 +114,8 @@ public class InMemoryTaskManager implements TaskManager {
         final HashMap<Integer, Epic> epicsMap = new HashMap<>(); //клонированные эпики
         for (Subtask subtask : subtasks.values()) {
             Integer epicId = subtask.getEpic().getId();
-            Epic cloneEpic;
-            if (epicsMap.containsKey(epicId)) {
-                cloneEpic = epicsMap.get(epicId);
-            } else {
-                cloneEpic = cloneEpicBySubtask(subtask);
+            if (!epicsMap.containsKey(epicId)) {
+                Epic cloneEpic = cloneEpicBySubtask(subtask);
                 epicsMap.put(epicId, cloneEpic);
             }
             list.add(epicsMap.get(epicId).getSubtasks().get(subtask.getId())); //возращаем копию объекта
@@ -128,16 +125,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTaskById(int id) {
+        historyManager.remove(id);
         tasks.remove(id);
     }
 
     @Override
     public void deleteEpicById(int id) {
+        historyManager.remove(id);
         final Epic epic = epics.get(id);
         if (epic == null) return;
         epics.remove(id);
         final HashMap<Integer, Subtask> epicSubtasks = epic.getSubtasks();
         for (int key : epicSubtasks.keySet()) {
+            historyManager.remove(key);
             subtasks.remove(key);
         }
 
@@ -145,6 +145,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubtaskById(int id) {
+        historyManager.remove(id);
         Subtask subtask = subtasks.get(id);
         Epic epic = subtask.getEpic();
         subtasks.remove(id);
