@@ -1,6 +1,5 @@
 package manager;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
@@ -68,10 +67,6 @@ class FileBackedTaskManagerTest {
         manager = new FileBackedTaskManager(file);
     }
 
-    @AfterEach
-    void tearDown() {
-    }
-
     @Test
     void addTask() throws ManagerAddTaskException {
         Task task = new Task("Таск 1", "Описание 1", TaskStatus.NEW);
@@ -116,7 +111,7 @@ class FileBackedTaskManagerTest {
         ArrayList<String> lines = readFile();
         manager.deleteTaskById(1);
         ArrayList<String> linesAfterDelete = readFile();
-        assertEquals(2, manager.getAllTasks().size(), "Не корректная работа deleteTaskById");
+        assertEquals(2, manager.getAllTasks().size(), "Некорректная работа deleteTaskById");
         assertEquals(linesAfterDelete.size() + 1, lines.size(), "Не удален таск из файла");
     }
 
@@ -126,7 +121,7 @@ class FileBackedTaskManagerTest {
         ArrayList<String> lines = readFile();
         manager.deleteEpicById(1);
         ArrayList<String> linesAfterDelete = readFile();
-        assertEquals(2, manager.getAllEpics().size(), "Не корреектная работа deleteEpicsById");
+        assertEquals(2, manager.getAllEpics().size(), "Некорректная работа deleteEpicsById");
         assertEquals(linesAfterDelete.size() + 1, lines.size(), "Не удален эпик из файла");
     }
 
@@ -138,7 +133,7 @@ class FileBackedTaskManagerTest {
         manager.deleteSubtaskById(3);
         ArrayList<String> linesAfterDelete = readFile();
         assertEquals(2, manager.getAllSubtasks().size(),
-                "Не корректное удаление сабтаска по deleteSubtaskById");
+                "Некорректное удаление сабтаска по deleteSubtaskById");
         assertEquals(linesAfterDelete.size() + 1, lines.size(), "Не удален сабтаск из файла");
     }
 
@@ -228,5 +223,38 @@ class FileBackedTaskManagerTest {
                 "Не изменилось имя сабтаска в файле");
     }
 
+    @Test
+    void loadEmptyFile() throws ManagerAddTaskException {
+        FileBackedTaskManager fileManager = FileBackedTaskManager.loadFromFile(file);
+        System.out.println(fileManager.getAllTasks().size());
+        assertEquals(0, fileManager.getAllTasks().size(), "Некорректная обработка пустого файла");
+    }
 
+    @Test
+    void tryToLoadNonExistsFile() {
+        File nonExistsFile = new File("nonexists.csv");
+        assertThrows(RuntimeException.class, () -> FileBackedTaskManager.loadFromFile(nonExistsFile));
+    }
+
+    @Test
+    void addTasksMustSaveFileThenLoadFileMustAddTasks() throws ManagerAddTaskException {
+        Task task = new Task("Таск 1", "Описание 1", TaskStatus.NEW);
+        manager.addTask(task);
+        Task task2 = new Task("Таск 2", "Описание 2", TaskStatus.NEW);
+        manager.addTask(task2);
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(file);
+        assertEquals(manager.getAllTasks(), loadedManager.getAllTasks(),
+                "Не совпадают загруженные задачи с сохраненными");
+        assertEquals(manager.getTaskById(1), loadedManager.getTaskById(1),
+                "Не совпадают загруженные задачи с одинаковыми id");
+    }
+
+    @Test
+    void testExpectedExceptionWhenAddTaskWithSameId() throws ManagerAddTaskException {
+        Task task = new Task("Задача", "Описание", TaskStatus.NEW);
+        task.setId(1);
+        manager.addTask(task);
+        assertThrows(ManagerAddTaskException.class, () -> manager.addTask(task),
+                "Не выкинуло исключение ManagerAddTaskException при добавлении задачи с существующим id");
+    }
 }

@@ -143,28 +143,28 @@ class InMemoryTaskManagerTest {
     @Test
     void shouldReturnAllEpics() throws ManagerAddTaskException {
         addNewEpicsForTests(3);
-        assertEquals(3, manager.getAllEpics().size(), "Не корректная работа getAllEpics");
+        assertEquals(3, manager.getAllEpics().size(), "Некорректная работа getAllEpics");
     }
 
     @Test
     void shouldReturnsAllSubtasks() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         addSubtasksForTests(3, manager.getEpicById(1), TaskStatus.NEW);
-        assertEquals(3, manager.getAllSubtasks().size(), "Не корректная работа getAllSubtasks");
+        assertEquals(3, manager.getAllSubtasks().size(), "Некорректная работа getAllSubtasks");
     }
 
     @Test
     void deleteTaskById() throws ManagerAddTaskException {
         addThreeNewDifferentTasksForTests();
         manager.deleteTaskById(1);
-        assertEquals(2, manager.getAllTasks().size(), "Не корректная работа deleteTaskById");
+        assertEquals(2, manager.getAllTasks().size(), "Некорректная работа deleteTaskById");
     }
 
     @Test
     void deleteEpicById() throws ManagerAddTaskException {
         addNewEpicsForTests(3);
         manager.deleteEpicById(1);
-        assertEquals(2, manager.getAllEpics().size(), "Не корреектная работа deleteEpicsById");
+        assertEquals(2, manager.getAllEpics().size(), "Некорректная работа deleteEpicsById");
     }
 
     @Test
@@ -181,7 +181,7 @@ class InMemoryTaskManagerTest {
         addSubtasksForTests(3, manager.getEpicById(1), TaskStatus.NEW);
         manager.deleteSubtaskById(3);
         assertEquals(2, manager.getAllSubtasks().size(),
-                "Не корректное удаление сабтаска по deleteSubtaskById");
+                "Некорректное удаление сабтаска по deleteSubtaskById");
     }
 
     @Test

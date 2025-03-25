@@ -17,25 +17,20 @@ public class InMemoryTaskManager implements TaskManager {
 
     public <T extends Task> int getNewId(T task) throws ManagerAddTaskException {
         if ((task != null) && (task.getId() != null)) {
-            if (isExistsId(task, task.getId())) {
+            if (isExistsId(task.getId())) {
                 //надо прервать, не должны подавать таск с существующим id
                 throw new ManagerAddTaskException("Задача с таким id уже существует");
             }
         }
         idCount++;
-        while (isExistsId(task,idCount)){
+        while (isExistsId(idCount)) {
             idCount++;
         }
         return idCount;
     }
 
-    private <T extends Task> boolean isExistsId(T task, int id) {
-        if (task instanceof Subtask) {
-            return subtasks.containsKey(id);
-        } else if (task instanceof Epic) {
-            return epics.containsKey(id);
-        }
-        return tasks.containsKey(id);
+    private boolean isExistsId(int id) {
+        return subtasks.containsKey(id) || epics.containsKey(id) || tasks.containsKey(id);
     }
 
     @Override
