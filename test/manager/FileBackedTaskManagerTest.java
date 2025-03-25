@@ -21,7 +21,7 @@ class FileBackedTaskManagerTest {
     FileBackedTaskManager manager;
     File file;
 
-    private void addNewEpicsForTests(int count) {
+    private void addNewEpicsForTests(int count) throws ManagerAddTaskException {
         for (int i = 0; i < count; i++) {
             Epic epic = new Epic(String.format("Эпик No %d", i + 1), String.format("Описание эпика No %d", i + 1),
                     TaskStatus.NEW);
@@ -29,7 +29,7 @@ class FileBackedTaskManagerTest {
         }
     }
 
-    private void addSubtasksForTests(int count, Epic epic, TaskStatus status) {
+    private void addSubtasksForTests(int count, Epic epic, TaskStatus status) throws ManagerAddTaskException {
         for (int i = 0; i < count; i++) {
             Subtask subtask = new Subtask(String.format("Subtask No %d", i + 1),
                     String.format("Описание сабтаска No %d", i + 1),
@@ -38,7 +38,7 @@ class FileBackedTaskManagerTest {
         }
     }
 
-    private void addThreeNewDifferentTasksForTests() {
+    private void addThreeNewDifferentTasksForTests() throws ManagerAddTaskException {
         Task task1 = new Task("Первый таск", "Создать новую задачу", TaskStatus.NEW);
         Task task2 = new Task("Второй таск", "Создать вторую новую задачу", TaskStatus.IN_PROGRESS);
         Task task3 = new Task("Третий таск", "Создать третью новую задачу", TaskStatus.DONE);
@@ -49,7 +49,7 @@ class FileBackedTaskManagerTest {
 
     private ArrayList<String> readFile() {
         ArrayList<String> lines = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(file, FileBackedTaskManager.CS))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file, FileBackedTaskManager.CHARSET))) {
             while (br.ready()) {
                 String line = br.readLine();
                 if ((!line.isEmpty()) && (!line.isBlank())) {
@@ -73,7 +73,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void addTask() {
+    void addTask() throws ManagerAddTaskException {
         Task task = new Task("Таск 1", "Описание 1", TaskStatus.NEW);
         manager.addTask(task);
         ArrayList<String> lines = readFile();
@@ -83,7 +83,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void addEpic() {
+    void addEpic() throws ManagerAddTaskException {
         Epic epic = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW);
         manager.addEpic(epic);
         ArrayList<String> lines = readFile();
@@ -93,7 +93,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void addSubtask() {
+    void addSubtask() throws ManagerAddTaskException {
         Epic epic = new Epic("Эпик 1", "Описание 1", TaskStatus.NEW);
         manager.addEpic(epic);
         Subtask subtask1 = new Subtask("Сабтаск 1", "Описание сабтаска 1", TaskStatus.NEW);
@@ -111,7 +111,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void deleteTaskById() {
+    void deleteTaskById() throws ManagerAddTaskException {
         addThreeNewDifferentTasksForTests();
         ArrayList<String> lines = readFile();
         manager.deleteTaskById(1);
@@ -121,7 +121,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void deleteEpicById() {
+    void deleteEpicById() throws ManagerAddTaskException {
         addNewEpicsForTests(3);
         ArrayList<String> lines = readFile();
         manager.deleteEpicById(1);
@@ -131,7 +131,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void deleteSubtaskById() {
+    void deleteSubtaskById() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         addSubtasksForTests(3, manager.getEpicById(1), TaskStatus.NEW);
         ArrayList<String> lines = readFile();
@@ -143,7 +143,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void deleteAllTasks() {
+    void deleteAllTasks() throws ManagerAddTaskException {
         addThreeNewDifferentTasksForTests();
         manager.deleteAllTasks();
         ArrayList<String> lines = readFile();
@@ -152,7 +152,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void deleteAllEpics() {
+    void deleteAllEpics() throws ManagerAddTaskException {
         addNewEpicsForTests(3);
         manager.deleteAllEpics();
         ArrayList<String> lines = readFile();
@@ -161,7 +161,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void deleteAllEpicsMustDeleteAllSubtasks() {
+    void deleteAllEpicsMustDeleteAllSubtasks() throws ManagerAddTaskException {
         addNewEpicsForTests(2);
         addSubtasksForTests(2, manager.getEpicById(1), TaskStatus.NEW);
         addSubtasksForTests(2, manager.getEpicById(2), TaskStatus.NEW);
@@ -173,7 +173,7 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void deleteAllSubtasks() {
+    void deleteAllSubtasks() throws ManagerAddTaskException {
         addNewEpicsForTests(2);
         addSubtasksForTests(2, manager.getEpicById(1), TaskStatus.NEW);
         addSubtasksForTests(2, manager.getEpicById(2), TaskStatus.NEW);
@@ -183,47 +183,48 @@ class FileBackedTaskManagerTest {
         assertEquals(3, lines.size(),
                 "Не все строки сабтаски удалены из файла при удалении всех сабтасков");
     }
+
     @Test
-    void updateTaskNameMustChangeSavedTask() {
+    void updateTaskNameMustChangeSavedTask() throws ManagerAddTaskException {
         addThreeNewDifferentTasksForTests();
         Task task = manager.getTaskById(1);
-        String newName="Новое имя таска";
+        String newName = "Новое имя таска";
         task.setName(newName);
         manager.updateTask(task);
         ArrayList<String> lines = readFile();
         assertEquals(newName, manager.getTaskById(1).getName(),
                 "Обновление имени таска по updateTask");
-        assertEquals(newName,lines.get(1).split(FileBackedTaskManager.DELIMITER)[2],
+        assertEquals(newName, lines.get(1).split(FileBackedTaskManager.DELIMITER)[2],
                 "Не изменилось имя таска в файле");
     }
 
     @Test
-    void updateEpicNameMustChangeSavedEpic() {
+    void updateEpicNameMustChangeSavedEpic() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         Epic epic = manager.getEpicById(1);
-        String newName="Новое имя эпика";
+        String newName = "Новое имя эпика";
         epic.setName(newName);
         manager.updateEpic(epic);
         ArrayList<String> lines = readFile();
         assertEquals(newName, manager.getEpicById(1).getName(),
                 "Обновление имени эпика по updateEpic");
-        assertEquals(newName,lines.get(1).split(FileBackedTaskManager.DELIMITER)[2],
+        assertEquals(newName, lines.get(1).split(FileBackedTaskManager.DELIMITER)[2],
                 "Не изменилось имя эпика в файле");
 
     }
 
     @Test
-    void updateSubtaskNameMustChangeSavedSubtask() {
+    void updateSubtaskNameMustChangeSavedSubtask() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         addSubtasksForTests(1, manager.getEpicById(1), TaskStatus.NEW);
         Subtask subtask = manager.getSubtaskById(2);
-        String newName="Новое имя сабтаска";
+        String newName = "Новое имя сабтаска";
         subtask.setName(newName);
         manager.updateSubtask(subtask);
         ArrayList<String> lines = readFile();
         assertEquals(newName, manager.getSubtaskById(2).getName(),
                 "Обновление имени сабтаска при updateSubtask");
-        assertEquals(newName,lines.get(2).split(FileBackedTaskManager.DELIMITER)[2],
+        assertEquals(newName, lines.get(2).split(FileBackedTaskManager.DELIMITER)[2],
                 "Не изменилось имя сабтаска в файле");
     }
 

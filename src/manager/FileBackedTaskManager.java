@@ -8,13 +8,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.HashMap;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private File file;
     public static final String DELIMITER = ",";
     private static final String[] HEADER = {"id", "type", "name", "status", "description", "epic"};
 
-    public static final Charset CS = Charset.forName("UTF8");
+    public static final Charset CHARSET = Charset.forName("UTF8");
 
     public FileBackedTaskManager(File file) {
         super();
@@ -23,21 +25,44 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static void main(String[] args) {
         System.out.println(String.join(DELIMITER, HEADER));
+        File file = new File("c:\\Users\\ese\\AppData\\Local\\Temp\\manager16389311216411681848.csv");
+        loadFromFile(file);
+    }
+
+    static FileBackedTaskManager loadFromFile(File file) {
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
+        String[] lines;
+        try {
+            String str = Files.readString(file.toPath());
+            lines = str.split("\n");
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String[] headers = lines[0].split(DELIMITER);
+        for (int i = 1; i < lines.length; i++) {
+            String[] fields=lines[i].split(DELIMITER);
+            HashMap<String,String> properties=new HashMap<>();
+            for(int j=0;j<headers.length;j++){
+                properties.put(headers[j],fields[j]);
+            }
+        }
+        return fileBackedTaskManager;
     }
 
     private void save() {
 
-        try (FileWriter fileWriter = new FileWriter(file, CS)) {
+        try (FileWriter fileWriter = new FileWriter(file, CHARSET)) {
             fileWriter.write(String.format("%s\n", String.join(DELIMITER, HEADER))); //header
 
             for (Task task : getAllTasks()) {
                 fileWriter.write(String.format("%s\n", getFieldsForRow(task)));
             }
-            for (Epic epic:getAllEpics()){
-                fileWriter.write(String.format("%s\n",getFieldsForRow(epic)));
+            for (Epic epic : getAllEpics()) {
+                fileWriter.write(String.format("%s\n", getFieldsForRow(epic)));
             }
-            for(Subtask subtask:getAllSubtasks()){
-                fileWriter.write(String.format("%s\n",getFieldsForRow(subtask)));
+            for (Subtask subtask : getAllSubtasks()) {
+                fileWriter.write(String.format("%s\n", getFieldsForRow(subtask)));
             }
 
         } catch (IOException e) {
@@ -86,19 +111,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void addTask(Task task) {
+    public void addTask(Task task) throws ManagerAddTaskException {
         super.addTask(task);
         save();
     }
 
     @Override
-    public void addEpic(Epic epic) {
+    public void addEpic(Epic epic) throws ManagerAddTaskException {
         super.addEpic(epic);
         save();
     }
 
     @Override
-    public void addSubtask(Subtask subtask, Epic epic) {
+    public void addSubtask(Subtask subtask, Epic epic) throws ManagerAddTaskException {
         super.addSubtask(subtask, epic);
         save();
     }

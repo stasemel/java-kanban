@@ -15,22 +15,40 @@ public class InMemoryTaskManager implements TaskManager {
     private int idCount = 0;
     HistoryManager historyManager = Managers.getDefaultHistory();
 
-    public int getNewId() {
+    public <T extends Task> int getNewId(T task) throws ManagerAddTaskException {
+        if ((task != null) && (task.getId() != null)) {
+            if (isExistsId(task, task.getId())) {
+                //надо прервать, не должны подавать таск с существующим id
+                throw new ManagerAddTaskException("Задача с таким id уже существует");
+            }
+        }
         idCount++;
+        while (isExistsId(task,idCount)){
+            idCount++;
+        }
         return idCount;
     }
 
+    private <T extends Task> boolean isExistsId(T task, int id) {
+        if (task instanceof Subtask) {
+            return subtasks.containsKey(id);
+        } else if (task instanceof Epic) {
+            return epics.containsKey(id);
+        }
+        return tasks.containsKey(id);
+    }
+
     @Override
-    public void addTask(Task task) {
-        int id = getNewId();
+    public void addTask(Task task) throws ManagerAddTaskException {
+        int id = getNewId(task);
         task.setId(id);
         Task saveTask = task.cloneTask();
         tasks.put(id, saveTask);
     }
 
     @Override
-    public void addEpic(Epic epic) {
-        int id = getNewId();
+    public void addEpic(Epic epic) throws ManagerAddTaskException {
+        int id = getNewId(epic);
         epic.setId(id);
         Epic saveEpic = epic.cloneTask();
         epics.put(id, saveEpic);
@@ -38,10 +56,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addSubtask(Subtask subtask, Epic epic) {
+    public void addSubtask(Subtask subtask, Epic epic) throws ManagerAddTaskException {
         Epic savedEpic = epics.get(epic.getId());
         if (savedEpic != null) {
-            int id = getNewId();
+            int id = getNewId(subtask);
             subtask.setId(id);
             subtask.setEpic(epic);
             epic.addSubtask(subtask);

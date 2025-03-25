@@ -7,11 +7,11 @@ import task.Task;
 import java.util.ArrayList;
 
 public interface TaskManager {
-    void addTask(Task task);
+    void addTask(Task task) throws ManagerAddTaskException;
 
-    void addEpic(Epic epic);
+    void addEpic(Epic epic) throws ManagerAddTaskException;
 
-    void addSubtask(Subtask subtask, Epic epic);
+    void addSubtask(Subtask subtask, Epic epic) throws ManagerAddTaskException;
 
     Task getTaskById(int id);
 
