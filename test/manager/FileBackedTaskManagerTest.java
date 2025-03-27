@@ -96,7 +96,6 @@ class FileBackedTaskManagerTest {
         Subtask subtask2 = new Subtask("Сабтаск 2", "Описание сабтаска 2", TaskStatus.NEW);
         manager.addSubtask(subtask2, epic);
         ArrayList<String> lines = readFile();
-        //System.out.println(file.getAbsolutePath());
         assertEquals(epic, manager.getAllEpics().getFirst(), "Не добавлен эпик");
         assertEquals(subtask1, manager.getAllSubtasks().getFirst(), "Не добавлен сабтаск 1");
         assertEquals(2, epic.getSubtasks().size(), "Добавлены не все сабтаски к эпику");
