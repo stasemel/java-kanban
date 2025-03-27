@@ -1,3 +1,4 @@
+import manager.ManagerAddTaskException;
 import manager.Managers;
 import manager.TaskManager;
 import task.Epic;
@@ -7,14 +8,14 @@ import task.TaskStatus;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ManagerAddTaskException {
         TaskManager taskManager = Managers.getDefault();
         populate(taskManager);
         testViews(taskManager);
         printAllTasks(taskManager);
     }
 
-    private static void populate(TaskManager manager) {
+    private static void populate(TaskManager manager) throws ManagerAddTaskException {
         final int taskNumber = 5;
         final int epicNumber = 4;
         final int subtaskNamber = 3;

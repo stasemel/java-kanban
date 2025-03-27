@@ -16,7 +16,7 @@ class InMemoryTaskManagerTest {
 
     public InMemoryTaskManager manager;
 
-    private void addNewEpicsForTests(int count) {
+    private void addNewEpicsForTests(int count) throws ManagerAddTaskException {
         for (int i = 0; i < count; i++) {
             Epic epic = new Epic(String.format("Эпик No %d", i + 1), String.format("Описание эпика No %d", i + 1),
                     TaskStatus.NEW);
@@ -24,7 +24,7 @@ class InMemoryTaskManagerTest {
         }
     }
 
-    private void addSubtasksForTests(int count, Epic epic, TaskStatus status) {
+    private void addSubtasksForTests(int count, Epic epic, TaskStatus status) throws ManagerAddTaskException {
         for (int i = 0; i < count; i++) {
             Subtask subtask = new Subtask(String.format("Subtask No %d", i + 1),
                     String.format("Описание сабтаска No %d", i + 1),
@@ -33,7 +33,7 @@ class InMemoryTaskManagerTest {
         }
     }
 
-    private void addThreeNewDifferentTasksForTests() {
+    private void addThreeNewDifferentTasksForTests() throws ManagerAddTaskException {
         Task task1 = new Task("Первый таск", "Создать новую задачу", TaskStatus.NEW);
         Task task2 = new Task("Второй таск", "Создать вторую новую задачу", TaskStatus.IN_PROGRESS);
         Task task3 = new Task("Третий таск", "Создать третью новую задачу", TaskStatus.DONE);
@@ -48,7 +48,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldAddTaskDoNotChangeFieldsExceptId() {
+    void shouldAddTaskDoNotChangeFieldsExceptId() throws ManagerAddTaskException {
         Task task = new Task("Первый", "Описание первого", TaskStatus.IN_PROGRESS);
         String name = task.getName();
         String description = task.getDescription();
@@ -61,7 +61,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldAddTaskWithSameStatus() {
+    void shouldAddTaskWithSameStatus() throws ManagerAddTaskException {
         Task task1 = new Task("Первый таск", "Создать новую задачу", TaskStatus.IN_PROGRESS);
         manager.addTask(task1);
         assertEquals(TaskStatus.IN_PROGRESS, manager.getTaskById(1).getStatus(),
@@ -69,14 +69,14 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldAddThreeTasksAndReturnsGetAllTasks() {
+    void shouldAddThreeTasksAndReturnsGetAllTasks() throws ManagerAddTaskException {
         addThreeNewDifferentTasksForTests();
         assertEquals(3, manager.getAllTasks().size(), "Не создались задачи типа Task");
     }
 
 
     @Test
-    void ahouldAddEpicAndStatusMustSetNew() {
+    void shouldAddEpicAndStatusMustSetNew() throws ManagerAddTaskException {
         Epic epic1 = new Epic("Первый эпик", "Проверяем создание первого эпика", TaskStatus.DONE);
         manager.addEpic(epic1);
         assertEquals(TaskStatus.NEW, manager.getEpicById(1).getStatus(),
@@ -84,7 +84,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldAddOneSubtaskWithStatusNew() {
+    void shouldAddOneSubtaskWithStatusNew() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         Subtask subtask = new Subtask("Subtask", "Описание Subtask", TaskStatus.NEW);
         manager.addSubtask(subtask, manager.getEpicById(1));
@@ -93,7 +93,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldAddOneSubtaskWithStatusInProgress() {
+    void shouldAddOneSubtaskWithStatusInProgress() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         Subtask subtask = new Subtask("Subtask", "Описание Subtask", TaskStatus.IN_PROGRESS);
         manager.addSubtask(subtask, manager.getEpicById(1));
@@ -102,7 +102,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void changeEpicStatusWhenAddSubtaskInPorgress() {
+    void changeEpicStatusWhenAddSubtaskInProgress() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         Subtask subtask = new Subtask("Subtask", "Описание Subtask", TaskStatus.IN_PROGRESS);
         manager.addSubtask(subtask, manager.getEpicById(1));
@@ -111,7 +111,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void changeEpicStatusWhenAddSubtaskDone() {
+    void changeEpicStatusWhenAddSubtaskDone() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         Subtask subtask = new Subtask("Subtask", "Описание Subtask", TaskStatus.DONE);
         manager.addSubtask(subtask, manager.getEpicById(1));
@@ -120,19 +120,19 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void getTaskByIdMustReturnsTask() {
+    void getTaskByIdMustReturnsTask() throws ManagerAddTaskException {
         addThreeNewDifferentTasksForTests();
         assertInstanceOf(Task.class, manager.getTaskById(2), "Не удалось получить Task по id");
     }
 
     @Test
-    void getEpicByIdMustReturnsEpic() {
+    void getEpicByIdMustReturnsEpic() throws ManagerAddTaskException {
         addNewEpicsForTests(2);
         assertInstanceOf(Epic.class, manager.getEpicById(2), "Не удалось получить Task по id");
     }
 
     @Test
-    void getSubtaskByIdMustReturnsSubtask() {
+    void getSubtaskByIdMustReturnsSubtask() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         Subtask subtask = new Subtask("Subtask", "Описание Subtask", TaskStatus.IN_PROGRESS);
         manager.addSubtask(subtask, manager.getEpicById(1));
@@ -141,34 +141,34 @@ class InMemoryTaskManagerTest {
 
 
     @Test
-    void shouldReturnAllEpics() {
+    void shouldReturnAllEpics() throws ManagerAddTaskException {
         addNewEpicsForTests(3);
-        assertEquals(3, manager.getAllEpics().size(), "Не корректная работа getAllEpics");
+        assertEquals(3, manager.getAllEpics().size(), "Некорректная работа getAllEpics");
     }
 
     @Test
-    void shouldReturnsAllSubtasks() {
+    void shouldReturnsAllSubtasks() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         addSubtasksForTests(3, manager.getEpicById(1), TaskStatus.NEW);
-        assertEquals(3, manager.getAllSubtasks().size(), "Не корректная работа getAllSubtasks");
+        assertEquals(3, manager.getAllSubtasks().size(), "Некорректная работа getAllSubtasks");
     }
 
     @Test
-    void deleteTaskById() {
+    void deleteTaskById() throws ManagerAddTaskException {
         addThreeNewDifferentTasksForTests();
         manager.deleteTaskById(1);
-        assertEquals(2, manager.getAllTasks().size(), "Не корректная работа deleteTaskById");
+        assertEquals(2, manager.getAllTasks().size(), "Некорректная работа deleteTaskById");
     }
 
     @Test
-    void deleteEpicById() {
+    void deleteEpicById() throws ManagerAddTaskException {
         addNewEpicsForTests(3);
         manager.deleteEpicById(1);
-        assertEquals(2, manager.getAllEpics().size(), "Не корреектная работа deleteEpicsById");
+        assertEquals(2, manager.getAllEpics().size(), "Некорректная работа deleteEpicsById");
     }
 
     @Test
-    void deleteEpicByIdMustDeleteSubtasks() {
+    void deleteEpicByIdMustDeleteSubtasks() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         addSubtasksForTests(2, manager.getEpicById(1), TaskStatus.NEW);
         manager.deleteEpicById(1);
@@ -176,30 +176,30 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void deleteSubtaskById() {
+    void deleteSubtaskById() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         addSubtasksForTests(3, manager.getEpicById(1), TaskStatus.NEW);
         manager.deleteSubtaskById(3);
         assertEquals(2, manager.getAllSubtasks().size(),
-                "Не корректное удаление сабтаска по deleteSubtaskById");
+                "Некорректное удаление сабтаска по deleteSubtaskById");
     }
 
     @Test
-    void deleteAllTasks() {
+    void deleteAllTasks() throws ManagerAddTaskException {
         addThreeNewDifferentTasksForTests();
         manager.deleteAllTasks();
         assertEquals(0, manager.getAllTasks().size(), "Проверка удаления всех Tasks");
     }
 
     @Test
-    void deleteAllEpics() {
+    void deleteAllEpics() throws ManagerAddTaskException {
         addNewEpicsForTests(3);
         manager.deleteAllEpics();
         assertEquals(0, manager.getAllEpics().size(), "Проверка удаления всех Epics");
     }
 
     @Test
-    void deleteAllEpicsMustDeleteAllSubtasks() {
+    void deleteAllEpicsMustDeleteAllSubtasks() throws ManagerAddTaskException {
         addNewEpicsForTests(2);
         addSubtasksForTests(2, manager.getEpicById(1), TaskStatus.NEW);
         addSubtasksForTests(2, manager.getEpicById(2), TaskStatus.NEW);
@@ -209,7 +209,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void deleteAllSubtasks() {
+    void deleteAllSubtasks() throws ManagerAddTaskException {
         addNewEpicsForTests(2);
         addSubtasksForTests(2, manager.getEpicById(1), TaskStatus.NEW);
         addSubtasksForTests(2, manager.getEpicById(2), TaskStatus.NEW);
@@ -218,7 +218,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void deleteAllSubtasksMustChangeEpicStatusToNew() {
+    void deleteAllSubtasksMustChangeEpicStatusToNew() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         addSubtasksForTests(2, manager.getEpicById(1), TaskStatus.IN_PROGRESS);
         manager.deleteAllSubtasks();
@@ -226,7 +226,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void updateTaskNameMustChangeSavedTask() {
+    void updateTaskNameMustChangeSavedTask() throws ManagerAddTaskException {
         addThreeNewDifferentTasksForTests();
         Task task = manager.getTaskById(1);
         task.setName("Новое имя таска");
@@ -236,7 +236,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void updateEpicNameMustChangeSavedEpic() {
+    void updateEpicNameMustChangeSavedEpic() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         Epic epic = manager.getEpicById(1);
         epic.setName("Новое имя эпика");
@@ -247,7 +247,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void updateSubtaskNameMustChangeSavedSubtask() {
+    void updateSubtaskNameMustChangeSavedSubtask() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         addSubtasksForTests(1, manager.getEpicById(1), TaskStatus.NEW);
         Subtask subtask = manager.getSubtaskById(2);
@@ -258,7 +258,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void updateSubtaskStatusDoneMustChangeEpicStatus() {
+    void updateSubtaskStatusDoneMustChangeEpicStatus() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         addSubtasksForTests(1, manager.getEpicById(1), TaskStatus.NEW);
         Subtask subtask = manager.getSubtaskById(2);
@@ -269,7 +269,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void getSubtaskByEpicMustReturnAllEpicSuntasks() {
+    void getSubtaskByEpicMustReturnAllEpicSubtasks() throws ManagerAddTaskException {
         addNewEpicsForTests(1);
         addSubtasksForTests(5, manager.getEpicById(1), TaskStatus.NEW);
         assertEquals(5, manager.getSubtaskByEpic(manager.getEpicById(1)).size(),
@@ -278,7 +278,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldReturnThreeTasksOneEpicAndTwoSubtaskAtGetHistory() {
+    void shouldReturnThreeTasksOneEpicAndTwoSubtaskAtGetHistory() throws ManagerAddTaskException {
         addThreeNewDifferentTasksForTests();
         addNewEpicsForTests(1);
         addSubtasksForTests(2, manager.getAllEpics().getFirst(), TaskStatus.NEW);
@@ -296,7 +296,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldHistoryMustContainAllViews() {
+    void shouldHistoryMustContainAllViews() throws ManagerAddTaskException {
         addNewEpicsForTests(11);
         for (Epic epic : manager.getAllEpics()) {
             manager.getEpicById(epic.getId());
@@ -307,7 +307,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldDeleteTaskMustRemoveFromHistory() {
+    void shouldDeleteTaskMustRemoveFromHistory() throws ManagerAddTaskException {
         addNewEpicsForTests(11);
         for (Epic epic : manager.getAllEpics()) {
             manager.getEpicById(epic.getId());

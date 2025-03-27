@@ -15,22 +15,35 @@ public class InMemoryTaskManager implements TaskManager {
     private int idCount = 0;
     HistoryManager historyManager = Managers.getDefaultHistory();
 
-    public int getNewId() {
+    public <T extends Task> int getNewId(T task) throws ManagerAddTaskException {
+        if ((task != null) && (task.getId() != null)) {
+            if (isExistsId(task.getId())) {
+                //надо прервать, не должны подавать таск с существующим id
+                throw new ManagerAddTaskException("Задача с таким id уже существует");
+            }
+        }
         idCount++;
+        while (isExistsId(idCount)) {
+            idCount++;
+        }
         return idCount;
     }
 
+    private boolean isExistsId(int id) {
+        return subtasks.containsKey(id) || epics.containsKey(id) || tasks.containsKey(id);
+    }
+
     @Override
-    public void addTask(Task task) {
-        int id = getNewId();
+    public void addTask(Task task) throws ManagerAddTaskException {
+        int id = getNewId(task);
         task.setId(id);
         Task saveTask = task.cloneTask();
         tasks.put(id, saveTask);
     }
 
     @Override
-    public void addEpic(Epic epic) {
-        int id = getNewId();
+    public void addEpic(Epic epic) throws ManagerAddTaskException {
+        int id = getNewId(epic);
         epic.setId(id);
         Epic saveEpic = epic.cloneTask();
         epics.put(id, saveEpic);
@@ -38,10 +51,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addSubtask(Subtask subtask, Epic epic) {
+    public void addSubtask(Subtask subtask, Epic epic) throws ManagerAddTaskException {
         Epic savedEpic = epics.get(epic.getId());
         if (savedEpic != null) {
-            int id = getNewId();
+            int id = getNewId(subtask);
             subtask.setId(id);
             subtask.setEpic(epic);
             epic.addSubtask(subtask);
