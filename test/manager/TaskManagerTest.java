@@ -369,7 +369,7 @@ abstract class TaskManagerTest {
         Duration duration = Duration.ofMinutes(60);
         LocalDateTime startTime2 = LocalDateTime.parse("2025-04-08 14:00", FileBackedTaskManager.DATE_TIME_FORMATTER);
         Duration duration2 = Duration.ofMinutes(120);
-        Epic epic = new Epic("Таск", "Описание таска", TaskStatus.NEW);
+        Epic epic = new Epic("Эпик", "Описание эпика", TaskStatus.NEW);
         manager.addEpic(epic);
         Subtask subtask = new Subtask("Сабтаск", "Описание сабтаска", TaskStatus.NEW, startTime2, duration);
         Subtask subtask2 = new Subtask("Сабтаск 2", "Описание сабтаска 2", TaskStatus.NEW, startTime, duration2);
@@ -410,6 +410,7 @@ abstract class TaskManagerTest {
         boolean isIntersections = manager.isTimeIntersections(task);
         boolean isIntersections2 = manager.isTimeIntersections(task2);
         boolean isIntersections3 = manager.isTimeIntersections(task3);
+        assertFalse(epic.getSubtasks().isEmpty(),"Не добавлены сабтаски");
         assertTrue(isIntersections
                 , "Некорректная работа проверки пересечений по времени. Время старта после другой задачи и до её окончания.");
         assertFalse(isIntersections2
@@ -424,6 +425,7 @@ abstract class TaskManagerTest {
         Duration duration = Duration.ofMinutes(60);
         Epic epic = createEpicsWithDuration();
         Task task = new Task("Таск", "Описание", TaskStatus.NEW, startTime, duration);
+        assertFalse(epic.getSubtasks().isEmpty(),"Не добавлены сабтаски");
         assertThrows(ManagerAddTaskException.class, () -> manager.addTask(task)
                 , "Разрешили пересечение по времени с другой задачей");
     }
@@ -446,6 +448,7 @@ abstract class TaskManagerTest {
         Task task = new Task("Таск", "Описание", TaskStatus.NEW, startTime, duration);
         manager.addTask(task);
         task.setStartTime(startTime.plusMinutes(120));
+        assertFalse(epic.getSubtasks().isEmpty(),"Не добавлены сабтаски");
         assertThrows(ManagerAddTaskException.class, () -> manager.updateTask(task)
                 , "Разрешили пересечение задачи по времени с другой задачей при изменении даты старта");
         task.setStartTime(startTime.plusMinutes(10));
@@ -454,7 +457,7 @@ abstract class TaskManagerTest {
     }
 
     @Test
-    void updateSubaskShouldNotIntersectWithOthers() throws ManagerAddTaskException {
+    void updateSubtaskShouldNotIntersectWithOthers() throws ManagerAddTaskException {
         LocalDateTime startTime = LocalDateTime.parse("2025-04-08 10:00", FileBackedTaskManager.DATE_TIME_FORMATTER);
         Duration duration = Duration.ofMinutes(60);
         Epic epic = createEpicsWithDuration();
@@ -467,4 +470,86 @@ abstract class TaskManagerTest {
         assertDoesNotThrow(() -> manager.updateSubtask(subtask)
                 , "Не разрешили изменить подзадачу без пересечения по времени с другой задачей при изменении даты старта");
     }
+
+    @Test
+    void checkOrderPrioritizedTasks() throws ManagerAddTaskException {
+        LocalDateTime startTime = LocalDateTime.parse("2025-04-08 10:00", FileBackedTaskManager.DATE_TIME_FORMATTER);
+        Duration duration = Duration.ofMinutes(1);
+        Task task1 = new Task("Task 1", "Description 1", TaskStatus.NEW, startTime, duration);
+        manager.addTask(task1);
+        Task task2 = new Task("Task 2", "Description 2", TaskStatus.NEW, startTime.plusMinutes(10), duration);
+        manager.addTask(task2);
+        Task task3 = new Task("Task 2", "Description 2", TaskStatus.NEW, startTime.minusMinutes(10), duration);
+        manager.addTask(task3);
+        List<Task> priorityAdd = manager.getPrioritizedTasks();
+        //update
+        task1.setStartTime(task1.getStartTime().plusMinutes(1));
+        manager.updateTask(task1);
+        task2.setStartTime(task2.getStartTime().minusHours(1));
+        manager.updateTask(task2);
+        task3.setStartTime(task3.getStartTime().plusMinutes(1));
+        manager.updateTask(task3);
+        List<Task> priorityUpdate = manager.getPrioritizedTasks();
+        assertTrue(areTheTasksInTheCorrectOrder(priorityAdd), "Нарушен порядок prioritizedTasks после добавления");
+        assertTrue(areTheTasksInTheCorrectOrder(priorityUpdate), "Нарушен порядок prioritizedTasks после изменения");
+    }
+
+    //проверка правильности порядка
+    private boolean areTheTasksInTheCorrectOrder(List<Task> priority) {
+        boolean isOrder = true;
+        Task lastTask = null;
+        for (Task task : priority) {
+            if ((lastTask != null) && (lastTask.getStartTime().isAfter(task.getStartTime()))) {
+                isOrder = false;
+                break;
+            }
+            lastTask = task;
+        }
+        return isOrder;
+    }
+
+    @Test
+    void testChangePrioritizedTasks() throws ManagerAddTaskException {
+        LocalDateTime startTime = LocalDateTime.parse("2025-04-08 10:00", FileBackedTaskManager.DATE_TIME_FORMATTER);
+        Duration duration = Duration.ofMinutes(1);
+        LocalDateTime startTime2 = LocalDateTime.parse("2025-04-08 10:10", FileBackedTaskManager.DATE_TIME_FORMATTER);
+        Task task = new Task("Task", "Description", TaskStatus.NEW, startTime, duration);
+        Task task2 = new Task("Task 2", "Description 2", TaskStatus.NEW, startTime2, duration);
+        manager.addTask(task);
+        manager.addTask(task2);
+        List<Task> priorityAdd = manager.getPrioritizedTasks();
+        task.setStartTime(startTime.plusMinutes(60));
+        manager.updateTask(task);
+        List<Task> priorityUpdate = manager.getPrioritizedTasks();
+        manager.deleteAllTasks();
+        List<Task> priorityDelete = manager.getPrioritizedTasks();
+        assertTrue(areTheTasksInTheCorrectOrder(priorityAdd), "Нарушен порядок prioritizedTasks после добавления");
+        assertEquals(priorityUpdate.getFirst().getStartTime(), task2.getStartTime(), "Не совпадает время последнего изменения таска");
+        assertEquals(2, priorityUpdate.size(), "Неправильное количество элементов в prioritizedTasks");
+        assertTrue(priorityDelete.isEmpty(), "Не удалились задачи из prioritizedTasks");
+    }
+    @Test
+    void testPriorityWhenAddingTaskAndSubtask() throws ManagerAddTaskException {
+        LocalDateTime startTime = LocalDateTime.parse("2025-04-08 10:00", FileBackedTaskManager.DATE_TIME_FORMATTER);
+        Duration duration = Duration.ofMinutes(1);
+        Task task = new Task("Task", "Description", TaskStatus.NEW, startTime, duration);
+        manager.addTask(task);
+        Task task2 = new Task("Task 2", "Description 2", TaskStatus.NEW, startTime.plusMinutes(10), duration);
+        manager.addTask(task2);
+        Task task3 = new Task("Task 3", "Таск без времени старта", TaskStatus.NEW);
+        manager.addTask(task3);
+        Epic epic = new Epic("Эпик", "Описание эпика", TaskStatus.NEW);
+        manager.addEpic(epic);
+        Subtask subtask = new Subtask("Сабтаск", "Описание сабтаска", TaskStatus.NEW, startTime.minusHours(1), duration);
+        Subtask subtask2 = new Subtask("Сабтаск 2", "Описание сабтаска 2", TaskStatus.NEW, startTime.plusHours(1), duration);
+        Subtask subtask3 = new Subtask("Сабтаск 3", "Сабтаск без времени старта", TaskStatus.NEW);
+        manager.addSubtask(subtask, epic);
+        manager.addSubtask(subtask2, epic);
+        manager.addSubtask(subtask3, epic);
+        List<Task> priorityAdd = manager.getPrioritizedTasks();
+        assertTrue(areTheTasksInTheCorrectOrder(priorityAdd), "Нарушен порядок prioritizedTasks после добавления");
+        assertEquals(4,priorityAdd.size(),"Не все таски и сабтаски попали в prioritizedTasks");
+
+    }
 }
+

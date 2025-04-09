@@ -84,8 +84,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
             switch (properties.get("type")) {
                 case "TASK":
-                    Task task = new Task(properties.get("name"), properties.get("description")
-                            , TaskStatus.valueOf(properties.get("status")));
+                    Task task = new Task(properties.get("name"), properties.get("description"),
+                            TaskStatus.valueOf(properties.get("status")));
                     if ((properties.get("startTme") != null) && (!properties.get("startTme").isBlank())) {
                         task.setStartTime(LocalDateTime.parse(properties.get("startTime"), DATE_TIME_FORMATTER));
                     }
@@ -95,12 +95,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     task.setId(Integer.valueOf(properties.get("id")));
                     fileBackedTaskManager.addTask(task);
                     break;
+
                 case "EPIC":
                     Epic epic = new Epic(properties.get("name"), properties.get("description"),
                             TaskStatus.valueOf(properties.get("status")));
                     epic.setId(Integer.valueOf(properties.get("id")));
                     fileBackedTaskManager.addEpic(epic);
                     break;
+
                 case "SUBTASK":
                     Integer epicid;
                     try {
