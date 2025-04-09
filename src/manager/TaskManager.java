@@ -6,7 +6,6 @@ import task.Task;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 public interface TaskManager {
     void addTask(Task task) throws ManagerAddTaskException;
@@ -50,5 +49,6 @@ public interface TaskManager {
     ArrayList<Task> getHistory();
 
     List<Task> getPrioritizedTasks();
+
     <T extends Task> boolean isTimeIntersections(T task);
 }

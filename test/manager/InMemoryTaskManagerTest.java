@@ -8,7 +8,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest {
     @Override
     @BeforeEach
     public void createManager() {
-        manager = (InMemoryTaskManager) Managers.getDefault();
+        manager = Managers.getDefault();
     }
 
 }

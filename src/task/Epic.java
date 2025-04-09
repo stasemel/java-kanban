@@ -2,7 +2,9 @@ package task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 public class Epic extends Task {
     private final HashMap<Integer, Subtask> subtasks;
@@ -19,23 +21,13 @@ public class Epic extends Task {
         LocalDateTime startTime = null;
         LocalDateTime endTime = null;
         Duration duration = null;
-        for (Subtask subtask : subtasks.values()) {
-            if (startTime == null) {
-                startTime = subtask.getStartTime();
-            } else {
-                if (startTime.isAfter(subtask.getStartTime())) {
-                    startTime = subtask.getStartTime();
-                }
-            }
-            if (endTime == null) {
-                if (subtask.getEndTime() != null) {
-                    endTime = subtask.getEndTime();
-                }
-            } else {
-                if ((subtask.getEndTime() != null) && (endTime.isBefore(subtask.getEndTime()))) {
-                    endTime = subtask.getEndTime();
-                }
-            }
+        List<Subtask> subtaskWithStartTime = subtasks.values().stream()
+                .filter(task -> task.getStartTime() != null)
+                .sorted(Comparator.comparing(Task::getStartTime))
+                .toList();
+        if (!subtaskWithStartTime.isEmpty()) {
+            startTime = subtaskWithStartTime.getFirst().getStartTime();
+            endTime = subtaskWithStartTime.getLast().getEndTime();
         }
         if ((startTime != null) && (endTime != null)) {
             duration = Duration.between(startTime, endTime);
