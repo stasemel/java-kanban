@@ -11,13 +11,18 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
     public static final String DELIMITER = ",";
-    private static final String[] HEADER = {"id", "type", "name", "status", "description", "epic"};
+    private static final String[] HEADER = {"id", "type", "name", "status", "description", "epic", "startTime", "duration"};
+
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     public static final Charset CHARSET = StandardCharsets.UTF_8; // как вариант - Charset.forName("UTF8");
 
@@ -79,8 +84,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
             switch (properties.get("type")) {
                 case "TASK":
-                    Task task = new Task(properties.get("name"), properties.get("description"),
-                            TaskStatus.valueOf(properties.get("status")));
+                    Task task = new Task(properties.get("name"), properties.get("description")
+                            , TaskStatus.valueOf(properties.get("status")));
+                    if ((properties.get("startTme") != null) && (!properties.get("startTme").isBlank())) {
+                        task.setStartTime(LocalDateTime.parse(properties.get("startTime"), DATE_TIME_FORMATTER));
+                    }
+                    if ((properties.get("duration") != null) && (!properties.get("duration").isBlank())) {
+                        task.setDuration(Duration.ofMinutes(Long.parseLong(properties.get("duration"))));
+                    }
                     task.setId(Integer.valueOf(properties.get("id")));
                     fileBackedTaskManager.addTask(task);
                     break;
@@ -99,7 +110,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     }
                     Epic subtaskEpic = fileBackedTaskManager.getEpicById(epicid);
                     Subtask subtask = new Subtask(properties.get("name"), properties.get("description"),
-                            TaskStatus.valueOf(properties.get("status")));
+                            TaskStatus.valueOf(properties.get("status"))
+                    );
+                    if ((properties.get("startTme") != null) && (!properties.get("startTme").isBlank())) {
+                        subtask.setStartTime(LocalDateTime.parse(properties.get("startTime"), DATE_TIME_FORMATTER));
+                    }
+                    if ((properties.get("duration") != null) && (!properties.get("duration").isBlank())) {
+                        subtask.setDuration(Duration.ofMinutes(Long.parseLong(properties.get("duration"))));
+                    }
                     subtask.setId(Integer.valueOf(properties.get("id")));
                     if (subtaskEpic != null) {
                         fileBackedTaskManager.addSubtask(subtask, subtaskEpic);
@@ -176,6 +194,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     } else {
                         value = "";
                     }
+                    break;
+                case "startTime":
+                    if (task.getStartTime() == null) {
+                        value = "";
+                    } else {
+                        value = task.getStartTime().format(DATE_TIME_FORMATTER);
+                    }
+                    break;
+                case "duration":
+                    if (task.getDuration() == null) {
+                        value = "";
+                    } else {
+                        value = String.valueOf(task.getDuration().toMinutes());
+                    }
             }
             fields[count] = value;
             count++;
@@ -238,7 +270,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateTask(Task task) {
+    public void updateTask(Task task) throws ManagerAddTaskException {
         super.updateTask(task);
         save();
     }
@@ -250,7 +282,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
+    public void updateSubtask(Subtask subtask) throws ManagerAddTaskException {
         super.updateSubtask(subtask);
         save();
     }

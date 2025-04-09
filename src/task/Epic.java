@@ -1,5 +1,7 @@
 package task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 public class Epic extends Task {
@@ -10,8 +12,41 @@ public class Epic extends Task {
         subtasks = new HashMap<>();
     }
 
+    public void calcEndTimeEpic() {
+        if (subtasks.isEmpty()) {
+            return;
+        }
+        LocalDateTime startTime = null;
+        LocalDateTime endTime = null;
+        Duration duration = null;
+        for (Subtask subtask : subtasks.values()) {
+            if (startTime == null) {
+                startTime = subtask.getStartTime();
+            } else {
+                if (startTime.isAfter(subtask.getStartTime())) {
+                    startTime = subtask.getStartTime();
+                }
+            }
+            if (endTime == null) {
+                if (subtask.getEndTime() != null) {
+                    endTime = subtask.getEndTime();
+                }
+            } else {
+                if ((subtask.getEndTime() != null) && (endTime.isBefore(subtask.getEndTime()))) {
+                    endTime = subtask.getEndTime();
+                }
+            }
+        }
+        if ((startTime != null) && (endTime != null)) {
+            duration = Duration.between(startTime, endTime);
+        }
+        this.setStartTime(startTime);
+        this.setDuration(duration);
+    }
+
     public void addSubtask(Subtask subtask) {
         subtasks.put(subtask.getId(), subtask);
+        calcEndTimeEpic();
     }
 
     public HashMap<Integer, Subtask> getSubtasks() {
@@ -24,11 +59,12 @@ public class Epic extends Task {
         outEpic.setId(getId());
         outEpic.setId(this.getId());
         for (Subtask subtask : subtasks.values()) {
-            Subtask outSubtask = new Subtask(subtask.getName(), subtask.getDescription(), subtask.getStatus());
+            Subtask outSubtask = new Subtask(subtask.getName(), subtask.getDescription(), subtask.getStatus(), subtask.getStartTime(), subtask.getDuration());
             outSubtask.setId(subtask.getId());
             outSubtask.setEpic(outEpic);
             outEpic.subtasks.put(subtask.getId(), outSubtask);
         }
+        outEpic.calcEndTimeEpic();
         return outEpic;
     }
 
@@ -40,6 +76,8 @@ public class Epic extends Task {
                 ", description='" + getDescription() + '\'' +
                 ", id=" + getId() +
                 ", status=" + getStatus() +
+                ", duration=" + getDuration() +
+                ", startTime=" + getStartTime() +
                 '}';
     }
 }

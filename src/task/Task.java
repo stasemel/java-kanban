@@ -1,5 +1,7 @@
 package task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -7,11 +9,26 @@ public class Task {
     private String name;
     private String description;
     private TaskStatus status;
+    private LocalDateTime startTime;
+    private Duration duration;
+    private LocalDateTime endTime;
 
     public Task(String name, String description, TaskStatus status) {
         this.name = name;
         this.description = description;
         this.status = status;
+        this.startTime = null;
+        this.endTime = null;
+        this.duration = null;
+    }
+
+    public Task(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.startTime = startTime;
+        this.duration = duration;
+        calcEndTime();
     }
 
     public String getName() {
@@ -46,6 +63,37 @@ public class Task {
         return status;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+        calcEndTime();
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+        calcEndTime();
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    private void calcEndTime() {
+        if (startTime == null) return;
+        if (duration == null) {
+            endTime = startTime;
+            return;
+        }
+        endTime = startTime.plusMinutes(duration.toMinutes());
+    }
+
     @Override
     public String toString() {
         return "Task{" +
@@ -53,6 +101,8 @@ public class Task {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
+                ", startTime=" + startTime +
+                ", duration=" + duration +
                 '}';
     }
 
@@ -71,6 +121,8 @@ public class Task {
 
     public Task cloneTask() {
         Task task = new Task(name, description, status);
+        task.setStartTime(startTime);
+        task.setDuration(duration);
         task.setId(id);
         return task;
     }
@@ -79,5 +131,7 @@ public class Task {
         this.name = task.name;
         this.description = task.description;
         this.status = task.status;
+        this.startTime = task.startTime;
+        this.duration = task.duration;
     }
 }
