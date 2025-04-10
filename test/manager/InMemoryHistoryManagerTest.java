@@ -46,7 +46,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void changeTaskDoNotChangeTaskInHistory() {
+    void changeTaskAfterGetHistory() {
         Task task = new Task("Первый таск", "Описание", TaskStatus.NEW);
         manager.add(task);
         task.setName("Измененное имя");

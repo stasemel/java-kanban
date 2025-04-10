@@ -410,7 +410,7 @@ abstract class TaskManagerTest {
         boolean isIntersections = manager.isTimeIntersections(task);
         boolean isIntersections2 = manager.isTimeIntersections(task2);
         boolean isIntersections3 = manager.isTimeIntersections(task3);
-        assertFalse(epic.getSubtasks().isEmpty(),"Не добавлены сабтаски");
+        assertFalse(epic.getSubtasks().isEmpty(), "Не добавлены сабтаски");
         assertTrue(isIntersections
                 , "Некорректная работа проверки пересечений по времени. Время старта после другой задачи и до её окончания.");
         assertFalse(isIntersections2
@@ -425,7 +425,7 @@ abstract class TaskManagerTest {
         Duration duration = Duration.ofMinutes(60);
         Epic epic = createEpicsWithDuration();
         Task task = new Task("Таск", "Описание", TaskStatus.NEW, startTime, duration);
-        assertFalse(epic.getSubtasks().isEmpty(),"Не добавлены сабтаски");
+        assertFalse(epic.getSubtasks().isEmpty(), "Не добавлены сабтаски");
         assertThrows(ManagerAddTaskException.class, () -> manager.addTask(task)
                 , "Разрешили пересечение по времени с другой задачей");
     }
@@ -448,7 +448,7 @@ abstract class TaskManagerTest {
         Task task = new Task("Таск", "Описание", TaskStatus.NEW, startTime, duration);
         manager.addTask(task);
         task.setStartTime(startTime.plusMinutes(120));
-        assertFalse(epic.getSubtasks().isEmpty(),"Не добавлены сабтаски");
+        assertFalse(epic.getSubtasks().isEmpty(), "Не добавлены сабтаски");
         assertThrows(ManagerAddTaskException.class, () -> manager.updateTask(task)
                 , "Разрешили пересечение задачи по времени с другой задачей при изменении даты старта");
         task.setStartTime(startTime.plusMinutes(10));
@@ -528,6 +528,7 @@ abstract class TaskManagerTest {
         assertEquals(2, priorityUpdate.size(), "Неправильное количество элементов в prioritizedTasks");
         assertTrue(priorityDelete.isEmpty(), "Не удалились задачи из prioritizedTasks");
     }
+
     @Test
     void testPriorityWhenAddingTaskAndSubtask() throws ManagerAddTaskException {
         LocalDateTime startTime = LocalDateTime.parse("2025-04-08 10:00", FileBackedTaskManager.DATE_TIME_FORMATTER);
@@ -548,7 +549,7 @@ abstract class TaskManagerTest {
         manager.addSubtask(subtask3, epic);
         List<Task> priorityAdd = manager.getPrioritizedTasks();
         assertTrue(areTheTasksInTheCorrectOrder(priorityAdd), "Нарушен порядок prioritizedTasks после добавления");
-        assertEquals(4,priorityAdd.size(),"Не все таски и сабтаски попали в prioritizedTasks");
+        assertEquals(4, priorityAdd.size(), "Не все таски и сабтаски попали в prioritizedTasks");
 
     }
 }

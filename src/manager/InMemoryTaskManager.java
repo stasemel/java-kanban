@@ -43,7 +43,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addTask(Task task) throws ManagerAddTaskException {
         if (isTimeIntersections(task)) {
-            throw new ManagerAddTaskException("Задача по времени пересекается с другой");
+            throw new ManagerAddTaskException(String.format("С %s по %s уже есть задача для исполнения",
+                    task.getStartTime(),
+                    task.getEndTime()));
         }
         int id = getNewId(task);
         task.setId(id);
@@ -64,7 +66,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addSubtask(Subtask subtask, Epic epic) throws ManagerAddTaskException {
         if (isTimeIntersections(subtask)) {
-            throw new ManagerAddTaskException("Задача по времени пересекается с другой");
+            throw new ManagerAddTaskException(String.format("С %s по %s уже есть задача для исполнения",
+                    subtask.getStartTime(),
+                    subtask.getEndTime()));
         }
         Epic savedEpic = epics.get(epic.getId());
         if (savedEpic != null) {
@@ -220,7 +224,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) throws ManagerAddTaskException {
         if (isTimeIntersections(task)) {
-            throw new ManagerAddTaskException("Задача по времени пересекается с другой");
+            throw new ManagerAddTaskException(String.format("С %s по %s уже есть задача для исполнения",
+                    task.getStartTime(),
+                    task.getEndTime()));
         }
         final int id = task.getId();
         if (tasks.containsKey(id)) {
@@ -242,7 +248,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask subtask) throws ManagerAddTaskException {
         if (isTimeIntersections(subtask)) {
-            throw new ManagerAddTaskException("Задача по времени пересекается с другой");
+            throw new ManagerAddTaskException(String.format("С %s по %s уже есть задача для исполнения",
+                    subtask.getStartTime(),
+                    subtask.getEndTime()));
         }
         final int id = subtask.getId();
         if (subtasks.containsKey(id)) {
