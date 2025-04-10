@@ -9,23 +9,21 @@ import task.TaskStatus;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InMemoryHistoryManagerTest {
 
-    InMemoryHistoryManager historyManager;
-
-    @BeforeEach
-    void initializeHistory() {
-        historyManager = new InMemoryHistoryManager();
-    }
+    InMemoryHistoryManager manager;
 
     @Test
     void addTask() {
         Task task = new Task("Первый таск", "Описание", TaskStatus.NEW);
         task.setId(10);
-        historyManager.add(task);
-        final ArrayList<Task> history = historyManager.getHistory();
+        manager.add(task);
+        final ArrayList<Task> history = manager.getHistory();
         assertNotNull(history, "Не создалась история");
         assertEquals(1, history.size(), "Не правильное количество записей в истории");
         assertEquals(task, history.getFirst(), "Задачи не совпадают");
@@ -38,8 +36,8 @@ class InMemoryHistoryManagerTest {
         Subtask subtask = new Subtask("Субтаск 1", "Описание к субтаску", TaskStatus.IN_PROGRESS);
         subtask.setId(11);
         epic.addSubtask(subtask);
-        historyManager.add(epic);
-        final ArrayList<Task> history = historyManager.getHistory();
+        manager.add(epic);
+        final ArrayList<Task> history = manager.getHistory();
         Epic first = (Epic) history.getFirst();
         assertNotNull(history, "Не создалась история");
         assertEquals(1, history.size(), "Неправильное количество записей в истории");
@@ -48,11 +46,11 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void changeTaskDoNotChangeTaskInHistory() {
+    void changeTaskAfterGetHistory() {
         Task task = new Task("Первый таск", "Описание", TaskStatus.NEW);
-        historyManager.add(task);
+        manager.add(task);
         task.setName("Измененное имя");
-        final ArrayList<Task> history = historyManager.getHistory();
+        final ArrayList<Task> history = manager.getHistory();
         assertNotEquals(task.getName(), history.getFirst().getName(), "Изменились данные в истории");
     }
 
@@ -61,25 +59,25 @@ class InMemoryHistoryManagerTest {
         for (int i = 1; i < 12; i++) {
             Task tasknext = new Task("Таск " + i, "Описание", TaskStatus.NEW);
             tasknext.setId(i);
-            historyManager.add(tasknext);
+            manager.add(tasknext);
         }
-        final ArrayList<Task> history = historyManager.getHistory();
+        final ArrayList<Task> history = manager.getHistory();
         assertNotNull(history, "Не создалась история");
         assertEquals(11, history.size(), "Неправильное количество записей в истории");
     }
 
     @Test
-    void shouldByLastWhenAdded() {
+    void shouldBeLastWhenAdded() {
         Task task = new Task("Таск " + 0, "Описание", TaskStatus.NEW);
         task.setId(0);
-        historyManager.add(task);
+        manager.add(task);
         for (int i = 1; i < 10; i++) {
             Task tasknext = new Task("Таск " + i, "Описание", TaskStatus.NEW);
             tasknext.setId(i);
-            historyManager.add(tasknext);
+            manager.add(tasknext);
         }
-        historyManager.add(task);
-        final ArrayList<Task> history = historyManager.getHistory();
+        manager.add(task);
+        final ArrayList<Task> history = manager.getHistory();
         assertNotNull(history, "Не создалась история");
         assertEquals(10, history.size(), "Неправильное количество записей в истории");
         assertEquals(history.get(9), task, "Не добавился в последнюю позицию");
@@ -89,9 +87,14 @@ class InMemoryHistoryManagerTest {
     void removeFromHistory() {
         Task task = new Task("Таск " + 0, "Описание", TaskStatus.NEW);
         task.setId(0);
-        historyManager.add(task);
-        historyManager.remove(0);
-        final ArrayList<Task> history = historyManager.getHistory();
+        manager.add(task);
+        manager.remove(0);
+        final ArrayList<Task> history = manager.getHistory();
         assertTrue(history.isEmpty(), "Не удалилась запись");
+    }
+
+    @BeforeEach
+    public void createManager() {
+        manager = new InMemoryHistoryManager();
     }
 }

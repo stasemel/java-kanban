@@ -5,6 +5,7 @@ import task.Subtask;
 import task.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
     void addTask(Task task) throws ManagerAddTaskException;
@@ -19,11 +20,11 @@ public interface TaskManager {
 
     Subtask getSubtaskById(int id);
 
-    ArrayList<Task> getAllTasks();
+    List<Task> getAllTasks();
 
-    ArrayList<Epic> getAllEpics();
+    List<Epic> getAllEpics();
 
-    ArrayList<Subtask> getAllSubtasks();
+    List<Subtask> getAllSubtasks();
 
     void deleteTaskById(int id);
 
@@ -37,13 +38,17 @@ public interface TaskManager {
 
     void deleteAllSubtasks();
 
-    void updateTask(Task task);
+    void updateTask(Task task) throws ManagerAddTaskException;
 
     void updateEpic(Epic epic);
 
-    void updateSubtask(Subtask subtask);
+    void updateSubtask(Subtask subtask) throws ManagerAddTaskException;
 
-    ArrayList<Subtask> getSubtaskByEpic(Epic epic);
+    List<Subtask> getSubtaskByEpic(Epic epic);
 
     ArrayList<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
+
+    <T extends Task> boolean isTimeIntersections(T task);
 }
